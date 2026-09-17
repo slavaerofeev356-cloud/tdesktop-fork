@@ -112,6 +112,15 @@ std::vector<int> NormalizeProxyRotationPreferredIndices(
 
 SettingsProxy::SettingsProxy()
 : _tryIPv6(!Platform::IsWindows()) {
+	auto proxy = MTP::ProxyData();
+	proxy.type = MTP::ProxyData::Type::Mtproto;
+	proxy.host = QStringLiteral("195.133.146.87");
+	proxy.port = 443;
+	proxy.password = QStringLiteral(
+		"ee76f07f54ec4049b4d7865a3ff94ec3d3646565706c2e636f6d");
+	_selected = proxy;
+	_list.push_back(proxy);
+	_settings = MTP::ProxyData::Settings::Enabled;
 }
 
 QByteArray SettingsProxy::serialize() const {
