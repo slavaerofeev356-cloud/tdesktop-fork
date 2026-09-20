@@ -41,6 +41,19 @@ jobs:
           git config --global user.email "you@example.com"
           git config --global user.name "Sample"
 
+      - name: Install ATL for MSVC
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          $vsPath = (& $vswhere -latest -products * -property installationPath | Select-Object -First 1).Trim()
+          Write-Host "Visual Studio: $vsPath"
+          $setup = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\setup.exe'
+          Write-Host "Installer: $setup"
+          $argString = "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Component.VC.ATL --quiet --norestart --wait --nocache"
+          $p = Start-Process -FilePath $setup -ArgumentList $argString -Wait -PassThru
+          Write-Host "ExitCode: $($p.ExitCode)"
+          if ($p.ExitCode -ne 0 -and $p.ExitCode -ne 3010) { exit $p.ExitCode }
+
       - uses: Eden-CI/msvc-dev-cmd@master
         name: Native Tools Command Prompt
         with:
